@@ -1,0 +1,31 @@
+.breathe .circle {
+  animation-name: breathe;
+  animation-duration: 7s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes breathe {
+  from, to {
+    transform: scale(0.5);
+  }
+
+  45%, 55% {
+    transform: scale(1);
+  }
+}
+
+.breathe .continue {
+  animation-name: fadeIn;
+  animation-duration: 10s;
+  animation-iteration-count: 1;
+}
+
+@keyframes fadeIn {
+  from, 90% {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

@@ -1,65 +1,243 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import { useState } from "react";
+import classNames from "classnames";
+import emotions from "./emotions.js";
+
+const SimpleStep = ({ children, onMoveToNextStepRequest }) => {
+  return (
+    <PageContainer onClick={onMoveToNextStepRequest}>
+      <div className="md:w-1/2 h-full flex flex-col">
+        <div className="mb-10 text-blue-100 flex-auto flex justify-center items-center text-center">
+          {children}
+        </div>
+        {onMoveToNextStepRequest && (
+          <div className="text-xl font-bold text-blue-100 text-center">
+            Press anywhere to continue
+          </div>
+        )}
+      </div>
+    </PageContainer>
+  );
+};
+
+const ScrollingPageContainer = ({ children }) => {
+  return (
+    <button className="flex flex-col w-full p-3 bg-gray-600 items-center justify-center">
+      {children}
+    </button>
+  );
+};
+
+const PageContainer = ({ onClick, children }) => {
+  const classNames =
+    "absolute flex w-full h-full p-3 bg-gray-600 items-center justify-center";
+  if (onClick) {
+    return (
+      <button onClick={onClick} className={classNames}>
+        {children}
+      </button>
+    );
+  } else {
+    return (
+      <div onClick={onClick} className={classNames}>
+        {children}
+      </div>
+    );
+  }
+};
+
+const LabellingEmotions = ({ onMoveToNextStepRequest }) => {
+  const [highlightedLabels, setHighlightedLabels] = useState([]);
+
+  const Label = ({ text, highlightedLabels, setHighlightedLabels }) => {
+    const isHighlighted = highlightedLabels.includes(text);
+
+    const handleClick = () => {
+      if (isHighlighted) {
+        setHighlightedLabels(highlightedLabels.filter((l) => l !== text));
+      } else {
+        const newHighlightedLabels = highlightedLabels.concat(text);
+        setHighlightedLabels(newHighlightedLabels);
+
+        if (newHighlightedLabels.length === 3) {
+          onMoveToNextStepRequest();
+        }
+      }
+    };
+
+    return (
+      <div
+        onClick={handleClick}
+        className={classNames("text-xl font-bold rounded p-2", {
+          "bg-gray-200": !isHighlighted,
+          "text-gray-700": !isHighlighted,
+          "bg-gray-500": isHighlighted,
+          "text-white": isHighlighted,
+        })}
+      >
+        {text}
+      </div>
+    );
+  };
+
+  return (
+    <ScrollingPageContainer>
+      <div className="text-4xl text-blue-200 p-3">
+        Choose three emotions you are feeling right now
+      </div>
+      <div className="w-full">
+        <div className="grid gap-2">
+          {emotions.bad.map((badEmotions) => {
+            {
+              return badEmotions.map((emotion) => {
+                return (
+                  <Label
+                    key={emotion}
+                    text={emotion}
+                    highlightedLabels={highlightedLabels}
+                    setHighlightedLabels={setHighlightedLabels}
+                  />
+                );
+              });
+            }
+          })}
+        </div>
+        <div className="grid gap-2">
+          {emotions.good.map((goodEmotions) => {
+            {
+              return goodEmotions.map((emotion) => {
+                return (
+                  <Label
+                    key={emotion}
+                    text={emotion}
+                    highlightedLabels={highlightedLabels}
+                    setHighlightedLabels={setHighlightedLabels}
+                  />
+                );
+              });
+            }
+          })}
+        </div>
+      </div>
+    </ScrollingPageContainer>
+  );
+};
+
+const BreatheStep = ({ onMoveToNextStepRequest }) => {
+  return (
+    <PageContainer onClick={onMoveToNextStepRequest}>
+      <div className="flex flex-col w-full h-full">
+        <div className="text-4xl text-blue-100 p-3">
+          Breathing helps calm you
+        </div>
+
+        <div className="breathe flex-grow w-full flex flex-auto items-center justify-center">
+          <div className="circle w-48 h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 flex justify-self-center items-center justify-center rounded-full text-4xl uppercase bg-blue-300 text-blue-800">
+            Breathe
+          </div>
+        </div>
+
+        <div className="text-xl font-bold text-blue-100">
+          Press anywhere to continue
+        </div>
+      </div>
+    </PageContainer>
+  );
+};
 
 export default function Home() {
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+  const [stepIndex, setStepIndex] = useState(0);
+  const onMoveToNextStepRequest = () => {
+    if (stepIndex === steps.length - 1) {
+      return;
+    }
+    setStepIndex(stepIndex + 1);
+  };
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
+  const steps = [
+    <SimpleStep onMoveToNextStepRequest={onMoveToNextStepRequest}>
+      <div className="text-4xl">
+        Welcome to <span className="text-blue-100">Breathe</span>, a tool
+        designed to help bring you down from a high level of anxiety.
+      </div>
+    </SimpleStep>,
+    <SimpleStep onMoveToNextStepRequest={onMoveToNextStepRequest}>
+      <div className="text-4xl">Let's focus on our breathing for a bit</div>
+    </SimpleStep>,
+    <BreatheStep onMoveToNextStepRequest={onMoveToNextStepRequest} />,
+    <SimpleStep onMoveToNextStepRequest={onMoveToNextStepRequest}>
+      <div className="text-4xl">Well done!</div>
+    </SimpleStep>,
+    <SimpleStep onMoveToNextStepRequest={onMoveToNextStepRequest}>
+      <div>
+        <div className="mb-10 text-4xl">
+          This exercise is called the
+          <span className="text-blue-200"> 5 4 3 2 1 Grounding Technique</span>.
+        </div>
+        <div className="text-3xl">
+          It should help to ground you in the present.
+        </div>
+      </div>
+    </SimpleStep>,
+    <SimpleStep onMoveToNextStepRequest={onMoveToNextStepRequest}>
+      <div className="text-4xl">
+        Name <span className="text-blue-200"> five </span> things you can see
+        around you
+      </div>
+    </SimpleStep>,
+    <SimpleStep onMoveToNextStepRequest={onMoveToNextStepRequest}>
+      <div className="text-4xl">
+        Focus on <span className="text-blue-200"> four </span> things you can
+        feel
+      </div>
+    </SimpleStep>,
+    <SimpleStep onMoveToNextStepRequest={onMoveToNextStepRequest}>
+      <div className="text-4xl">
+        Name <span className="text-blue-200"> three </span> things you can hear
+      </div>
+    </SimpleStep>,
+    <SimpleStep onMoveToNextStepRequest={onMoveToNextStepRequest}>
+      <div className="text-4xl">
+        Notice <span className="text-blue-200"> two </span> things you can smell
+      </div>
+    </SimpleStep>,
+    <SimpleStep onMoveToNextStepRequest={onMoveToNextStepRequest}>
+      <div className="text-4xl">
+        Focus on <span className="text-blue-200"> one </span> thing you can
+        taste
+      </div>
+    </SimpleStep>,
+    <SimpleStep onMoveToNextStepRequest={onMoveToNextStepRequest}>
+      <div className="text-4xl">Well done!</div>
+    </SimpleStep>,
+    <SimpleStep onMoveToNextStepRequest={onMoveToNextStepRequest}>
+      <div>
+        <div className="mb-10 text-4xl">Labelling your emotions</div>
+        <div className="text-3xl">
+          This exercise should help create distance between you and the emotions
+          you are currently feeling
+        </div>
+      </div>
+    </SimpleStep>,
+    <LabellingEmotions onMoveToNextStepRequest={onMoveToNextStepRequest} />,
+    <SimpleStep onMoveToNextStepRequest={onMoveToNextStepRequest}>
+      <div className="text-4xl">Well done!</div>
+    </SimpleStep>,
+    <SimpleStep>
+      <div>
+        <div className="mb-10 text-4xl">Well done, you made it to the end!</div>
+        <div className="text-3xl text-center">
+          This is just an experiment right now, but if it helped you or you have
+          any ideas how to make it better{" "}
           <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
+            href="mailto:andrew@andrewvos.com"
+            className="underline text-blue-200"
           >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
+            please let me know.
           </a>
         </div>
-      </main>
+      </div>
+    </SimpleStep>,
+  ];
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
+  return steps[stepIndex];
 }
