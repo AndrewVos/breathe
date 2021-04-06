@@ -1,6 +1,6 @@
 import { useState } from "react";
 import classNames from "classnames";
-import emotions from "./emotions.js";
+import emotions from "../lib/emotions.js";
 import Head from "next/head";
 
 const SimpleStep = ({ children, onMoveToNextStepRequest }) => {
