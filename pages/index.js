@@ -22,15 +22,15 @@ const SimpleStep = ({ children, onMoveToNextStepRequest }) => {
 
 const ScrollingPageContainer = ({ children }) => {
   return (
-    <button className="flex flex-col w-full p-3 bg-gray-600 items-center justify-center">
+    <div className="flex flex-col w-full p-3 bg-gray-600 items-center justify-center">
       {children}
-    </button>
+    </div>
   );
 };
 
 const PageContainer = ({ onClick, children }) => {
   const classNames =
-    "absolute flex w-full h-full p-3 bg-gray-600 items-center justify-center";
+    "absolute flex w-full h-full p-3 bg-gray-600 items-center justify-center focus:outline-none";
   if (onClick) {
     return (
       <button onClick={onClick} className={classNames}>
